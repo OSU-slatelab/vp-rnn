@@ -104,7 +104,9 @@ class Trainer:
         loss = self.criterion(output.view(data.size(1), -1), targets)
         if attention is not None:  # add penalization term
             loss = self.attn_reg(attention, loss)
-        return loss
+        confidence = output.view(data.size(1), -1)
+        logits = F.log_softmax(confidence, dim=1)
+        return loss, confidence, logits
 
     def epoch(self, ep, model):
         model.train()
