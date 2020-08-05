@@ -10,29 +10,30 @@ class Embed(nn.Module):
         super(Embed, self).__init__()
         self.encoder = nn.Embedding(ntoken, ninp)
         self.dictionary = dictionary
-        self.encoder.weight.data[self.dictionary.word2idx['<pad>']] = 0
-        self.encoder.weight.data[self.dictionary.word2idx['<pad>']] = 0
-        if os.path.exists(word_vector):
-            print('Loading word vectors from', word_vector)
-            vectors = torch.load(word_vector)
-            assert vectors[3] >= ninp
-            vocab = vectors[1]
-            vectors = vectors[2]
-            loaded_cnt = 0
-            unseen_cnt = 0
-            for word in self.dictionary.word2idx:
-                if word not in vocab:
-                    to_add = torch.zeros_like(vectors[0]).uniform_(-0.25,0.25)
-                    print("uncached word: " + word)
-                    unseen_cnt += 1
-                    #print(to_add)
-                else:
-                    loaded_id = vocab[word]
-                    to_add = vectors[loaded_id][:ninp]
-                    loaded_cnt += 1
-                real_id = self.dictionary.word2idx[word]
-                self.encoder.weight.data[real_id] = to_add
-            print('%d words from external word vectors loaded, %d unseen' % (loaded_cnt, unseen_cnt))  
+        if word_vector is not None:
+            self.encoder.weight.data[self.dictionary.word2idx['<pad>']] = 0
+            self.encoder.weight.data[self.dictionary.word2idx['<pad>']] = 0
+            if os.path.exists(word_vector):
+                print('Loading word vectors from', word_vector)
+                vectors = torch.load(word_vector)
+                assert vectors[3] >= ninp
+                vocab = vectors[1]
+                vectors = vectors[2]
+                loaded_cnt = 0
+                unseen_cnt = 0
+                for word in self.dictionary.word2idx:
+                    if word not in vocab:
+                        to_add = torch.zeros_like(vectors[0]).uniform_(-0.25,0.25)
+                        print("uncached word: " + word)
+                        unseen_cnt += 1
+                        #print(to_add)
+                    else:
+                        loaded_id = vocab[word]
+                        to_add = vectors[loaded_id][:ninp]
+                        loaded_cnt += 1
+                    real_id = self.dictionary.word2idx[word]
+                    self.encoder.weight.data[real_id] = to_add
+                print('%d words from external word vectors loaded, %d unseen' % (loaded_cnt, unseen_cnt))  
       
     def forward(self,input):
         return self.encoder(input)
