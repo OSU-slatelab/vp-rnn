@@ -14,7 +14,7 @@ setup(
     packages=find_packages(),
     
     python_requires='>=3',
-    install_requires=['torch<=1.4', 'scikit-learn', 'numpy'],
+    install_requires=['torch==1.4', 'scikit-learn', 'numpy'],
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
